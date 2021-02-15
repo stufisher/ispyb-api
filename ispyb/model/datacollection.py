@@ -26,6 +26,7 @@ class DataCollection(ispyb.model.DBCache):
         """
         self._cache_detector = None
         self._cache_group = None
+        self._cache_gridinfo = None
         self._db = db_area
         self._dcid = int(dcid)
         if preload:
@@ -46,6 +47,13 @@ class DataCollection(ispyb.model.DBCache):
         if self._cache_group is None:
             self._cache_group = DataCollectionGroup(self.dcgid, self._db.conn)
         return self._cache_group
+
+    @property
+    def gridinfo(self):
+        """Returns a GridInfo object."""
+        if self._cache_gridinfo is None:
+            self._cache_gridinfo = ispyb.model.gridinfo.GridInfo(self.dcid, self._db)
+        return self._cache_gridinfo
 
     @property
     def integrations(self):
@@ -227,7 +235,6 @@ class DataCollectionGroup(ispyb.model.DBCache):
                  the specified DataCollectionGroupID
         """
         self._cache_container = None
-        self._cache_gridinfo = None
         self._db = db_conn
         self._dcgid = int(dcgid)
         if preload:
@@ -247,9 +254,13 @@ class DataCollectionGroup(ispyb.model.DBCache):
     @property
     def gridinfo(self):
         """Returns a GridInfo object."""
-        if self._cache_gridinfo is None:
-            self._cache_gridinfo = ispyb.model.gridinfo.GridInfo(self.dcgid, self._db)
-        return self._cache_gridinfo
+        import warnings
+
+        warnings.warn(
+            "DataCollectionGroup.gridinfo is deprecated, use DataCollection.gridinfo instead.",
+            DeprecationWarning,
+        )
+        return
 
     @property
     def container(self):
